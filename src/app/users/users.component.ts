@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core'
-import { User, UsersStore } from '../store/users.store'
+import { Component, Input, OnInit } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { AsyncPipe, NgFor } from '@angular/common'
+import { User, UsersStore } from '../store/users.store'
 
 @Component({
   selector: 'app-users',
@@ -11,7 +11,7 @@ import { AsyncPipe, NgFor } from '@angular/common'
   styleUrl: './users.component.scss',
   providers: [UsersStore],
 })
-export class UsersComponent {
+export class UsersComponent implements OnInit {
   // Store userId
   userId: string | undefined = undefined
 
@@ -21,6 +21,7 @@ export class UsersComponent {
 
   ngOnInit(): void {
     this.users$ = this.usersStore.users$
+    this.usersStore.getUsers()
   }
 
   @Input()
