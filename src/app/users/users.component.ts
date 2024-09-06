@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { AsyncPipe, NgFor } from '@angular/common'
-import { User, UsersStore } from '../store/users.store'
+import { User, UsersStore } from 'store/users.store'
 
 @Component({
   selector: 'app-users',

@@ -3,7 +3,7 @@ import { ComponentStore } from '@ngrx/component-store'
 import { exhaustMap } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
 import { tapResponse } from '@ngrx/operators'
-import { UsersService } from '../users/users.service'
+import { UsersService } from 'users/users.service'
 
 export interface User {
   id: string
