@@ -8,8 +8,10 @@ import {Component, Input} from '@angular/core';
   styleUrl: './users.component.scss'
 })
 export class UsersComponent {
+  userId: string | undefined = undefined
+
   @Input()
   set id(id: string) {
-    console.log(id);
+    this.userId = id
   }
 }
