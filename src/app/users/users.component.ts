@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { Observable, of } from 'rxjs'
-import { AsyncPipe, NgFor } from '@angular/common'
 import { User, UsersStore } from 'store/users.store'
 import {
   MatCell,
@@ -14,13 +13,15 @@ import {
   MatRowDef,
   MatTable,
 } from '@angular/material/table'
+import { MatIcon } from '@angular/material/icon'
+import { MatMiniFabButton } from '@angular/material/button'
+import { MatProgressSpinner } from '@angular/material/progress-spinner'
+import { MatCard, MatCardContent } from '@angular/material/card'
 
 @Component({
   selector: 'app-users',
   standalone: true,
   imports: [
-    NgFor,
-    AsyncPipe,
     MatTable,
     MatHeaderCell,
     MatColumnDef,
@@ -31,18 +32,24 @@ import {
     MatRow,
     MatHeaderRowDef,
     MatRowDef,
+    MatIcon,
+    MatMiniFabButton,
+    MatProgressSpinner,
+    MatCard,
+    MatCardContent,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
   providers: [UsersStore],
 })
 export class UsersComponent implements OnInit {
-  // Store userId
+  isLoading = true
+
   userId: string | undefined = undefined
 
   users$: Observable<User[]> = of([])
 
-  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'email']
+  displayedColumns: string[] = ['firstName', 'lastName', 'email', 'edit']
 
   constructor(private readonly usersStore: UsersStore) {}
 
