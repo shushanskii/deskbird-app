@@ -20,6 +20,7 @@ import { MatCard, MatCardContent } from '@angular/material/card'
 import { MatDialog } from '@angular/material/dialog'
 import { UserEditDialogComponent } from './user-edit-dialog/user-edit-dialog.component'
 import { Router } from '@angular/router'
+import { AsyncPipe } from '@angular/common'
 
 @Component({
   selector: 'app-users',
@@ -40,6 +41,7 @@ import { Router } from '@angular/router'
     MatProgressSpinner,
     MatCard,
     MatCardContent,
+    AsyncPipe,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
@@ -51,6 +53,7 @@ export class UsersComponent implements OnInit {
   readonly dialog = inject(MatDialog)
 
   users$: Observable<User[]> = of([])
+  loading$: Observable<boolean> = of(false)
 
   displayedColumns: string[] = ['firstName', 'lastName', 'email', 'edit']
 
@@ -61,6 +64,7 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.users$ = this.usersStore.users$
+    this.loading$ = this.usersStore.loading$
     this.usersStore.getUsers()
   }
 

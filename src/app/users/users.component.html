@@ -2,7 +2,7 @@
   <div class="wrapper">
     <mat-card appearance="outlined">
       <mat-card-content>
-        @if (!isLoading) {
+        @if (loading$ | async) {
           <div class="loading-shade">
             <mat-spinner></mat-spinner>
           </div>

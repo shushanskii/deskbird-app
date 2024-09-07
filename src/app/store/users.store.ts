@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { ComponentStore } from '@ngrx/component-store'
-import { exhaustMap } from 'rxjs'
+import { exhaustMap, tap } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
 import { tapResponse } from '@ngrx/operators'
 import { UsersService } from 'users/users.service'
@@ -14,6 +14,7 @@ export interface User {
 }
 
 export interface UsersState {
+  loading: boolean
   users: User[]
 }
 
@@ -21,29 +22,49 @@ export interface UsersState {
 export class UsersStore extends ComponentStore<UsersState> {
   constructor(private readonly usersService: UsersService) {
     super({
+      loading: false,
       users: [],
     })
   }
 
   readonly users$ = this.select(state => state.users)
 
+  readonly loading$ = this.select(state => state.loading)
+
   readonly addUsers = this.updater((state, users: User[]) => ({
+    ...state,
     users: [...state.users, ...users],
   }))
 
-  readonly getUsers = this.effect<void>(
-    // The name of the source stream doesn't matter: `trigger$`, `source$` or `$` are good
-    // names. We encourage to choose one of these and use them consistently in your codebase.
-    trigger$ =>
-      trigger$.pipe(
-        exhaustMap(() =>
-          this.usersService.fetchUsers().pipe(
-            tapResponse({
-              next: users => this.addUsers(users),
-              error: (error: HttpErrorResponse) => console.error(error),
-            }),
+  readonly setLoading = this.updater((state, loading: boolean) => ({
+    ...state,
+    loading,
+  }))
+
+  readonly getUsers = () => {
+    this.setLoading(true)
+    this.effect<void>(trigger$ =>
+      trigger$
+        .pipe(
+          tap(() => {
+            this.setLoading(true)
+          }),
+        )
+        .pipe(
+          exhaustMap(() =>
+            this.usersService.fetchUsers().pipe(
+              tapResponse({
+                next: users => this.addUsers(users),
+                error: (error: HttpErrorResponse) => console.error(error),
+              }),
+            ),
           ),
+        )
+        .pipe(
+          tap(() => {
+            this.setLoading(false)
+          }),
         ),
-      ),
-  )
+    )()
+  }
 }
