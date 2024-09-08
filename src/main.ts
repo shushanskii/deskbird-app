@@ -7,8 +7,8 @@ const admin = {
   firstName: 'Admin',
   lastName: 'Admin',
   email: 'admin@email.com',
-  password: '$admin1',
-  isAdmin: false,
+  password: '123',
+  isAdmin: true,
 }
 localStorage.setItem('users', JSON.stringify([admin]))
 

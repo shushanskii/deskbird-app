@@ -20,7 +20,8 @@ import { MatCard, MatCardContent } from '@angular/material/card'
 import { MatDialog } from '@angular/material/dialog'
 import { UserEditDialogComponent } from './user-edit-dialog/user-edit-dialog.component'
 import { Router } from '@angular/router'
-import { AsyncPipe } from '@angular/common'
+import { AsyncPipe, JsonPipe } from '@angular/common'
+import { AuthService } from '../login/Auth.service'
 
 @Component({
   selector: 'app-users',
@@ -42,6 +43,7 @@ import { AsyncPipe } from '@angular/common'
     MatCard,
     MatCardContent,
     AsyncPipe,
+    JsonPipe,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
@@ -49,18 +51,19 @@ import { AsyncPipe } from '@angular/common'
 })
 export class UsersComponent {
   readonly dialog = inject(MatDialog)
+  readonly usersStore = inject(UsersStore)
+  readonly authService = inject(AuthService)
+  private router = inject(Router)
 
   users$: Observable<User[]> = of([])
   loading$: Observable<boolean> = of(false)
-
+  currentUser: User | undefined = undefined
   displayedColumns: string[] = ['firstName', 'lastName', 'email', 'edit']
 
-  constructor(
-    private readonly usersStore: UsersStore,
-    private router: Router,
-  ) {
+  constructor() {
     this.users$ = this.usersStore.users$
     this.loading$ = this.usersStore.loading$
+    this.currentUser = this.authService.getCurrentUser()
     this.usersStore.getUsers()
   }
 
@@ -88,8 +91,6 @@ export class UsersComponent {
       data: { ...user },
     })
 
-    dialogRef.afterClosed().subscribe(() => {
-      console.info('The dialog was closed')
-    })
+    dialogRef.afterClosed()
   }
 }

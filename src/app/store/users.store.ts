@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { ComponentStore } from '@ngrx/component-store'
 import { exhaustMap, tap } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
@@ -17,14 +17,18 @@ export interface User {
 export interface UsersState {
   loading: boolean
   users: User[]
+  currentUser: User | undefined
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class UsersStore extends ComponentStore<UsersState> {
-  constructor(private readonly usersService: UsersService) {
+  private readonly usersService: UsersService = inject(UsersService)
+
+  constructor() {
     super({
       loading: false,
       users: [],
+      currentUser: undefined,
     })
   }
 
@@ -40,6 +44,11 @@ export class UsersStore extends ComponentStore<UsersState> {
   readonly setLoading = this.updater((state, loading: boolean) => ({
     ...state,
     loading,
+  }))
+
+  readonly setCurrentUser = this.updater((state, user: User | undefined) => ({
+    ...state,
+    currentUser: user,
   }))
 
   readonly getUsers = () => {
