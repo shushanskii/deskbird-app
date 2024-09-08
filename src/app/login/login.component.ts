@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCardModule } from '@angular/material/card'
 import { MatSelectModule } from '@angular/material/select'
@@ -11,7 +11,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms'
-import Cookies from 'js-cookie'
+import { AuthService } from './Auth.service'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-login',
@@ -29,13 +30,16 @@ import Cookies from 'js-cookie'
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
+  authService: AuthService = inject(AuthService)
+  router: Router = inject(Router)
   hide = signal(true)
 
   passwordErrorMessage = signal('')
   loginErrorMessage = signal('')
+  hasError = signal(false)
 
   loginForm = new FormGroup({
-    login: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   })
 
@@ -53,17 +57,34 @@ export class LoginComponent {
     }
   }
 
-  onLoginBlur() {
-    const loginControl = this.loginForm.get('login')
+  onEmailBlur() {
+    const loginControl = this.loginForm.get('email')
     if (loginControl?.hasError('required')) {
-      this.loginErrorMessage.set('Login is required')
+      this.loginErrorMessage.set('Email is required')
     } else {
       this.loginErrorMessage.set('')
     }
   }
 
   onSubmit() {
-    Cookies.set('authorized', `${Date.now()}`)
-    console.info(this.loginForm.value)
+    if (!this.loginForm.valid) {
+      return
+    }
+
+    const authorized = this.authService.auth(
+      this.loginForm.value.email!,
+      this.loginForm.value.password!,
+    )
+
+    if (authorized) {
+      this.router.navigate(['/users'])
+      return
+    }
+
+    this.loginForm.controls.email.setValue('')
+    this.loginForm.controls.email.setErrors({ required: true })
+    this.loginForm.controls.password.setValue('')
+    this.loginForm.controls.password.setErrors({ required: true })
+    this.hasError.set(true)
   }
 }

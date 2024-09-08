@@ -3,21 +3,24 @@
     <mat-card appearance="outlined">
       <mat-card-header>
         <mat-card-title>Authentication</mat-card-title>
+        @if (hasError()) {
+          <mat-card-subtitle id="error">Unable to authenticate</mat-card-subtitle>
+        }
       </mat-card-header>
       <mat-card-content class="wrapper">
         <mat-form-field id="login">
-          <mat-label>Login</mat-label>
+          <mat-label>Email</mat-label>
           <input
-            formControlName="login"
+            formControlName="email"
             matInput
             required
-            (blur)="onLoginBlur()"
+            (blur)="onEmailBlur()"
           >
           @if (loginErrorMessage()) {
             <mat-error>{{ loginErrorMessage() }}</mat-error>
           }
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field style="width: 100%">
           <mat-label>Password</mat-label>
           <input
             matInput
