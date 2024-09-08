@@ -87,10 +87,8 @@ export class UsersComponent {
   }
 
   openDialog(user: User): void {
-    const dialogRef = this.dialog.open(UserEditDialogComponent, {
+    this.dialog.open(UserEditDialogComponent, {
       data: { ...user },
     })
-
-    dialogRef.afterClosed()
   }
 }

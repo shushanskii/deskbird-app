@@ -46,10 +46,17 @@ export class UsersStore extends ComponentStore<UsersState> {
     loading,
   }))
 
-  readonly setCurrentUser = this.updater((state, user: User | undefined) => ({
-    ...state,
-    currentUser: user,
-  }))
+  readonly updateUser = this.updater((state, _user: User) => {
+    const users = state.users.map(user => {
+      if (user?.id === _user.id) {
+        return _user
+      }
+
+      return user
+    })
+
+    return { ...state, users }
+  })
 
   readonly getUsers = () => {
     this.effect<void>(trigger$ =>
