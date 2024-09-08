@@ -42,7 +42,6 @@ export class UsersStore extends ComponentStore<UsersState> {
   }))
 
   readonly getUsers = () => {
-    this.setLoading(true)
     this.effect<void>(trigger$ =>
       trigger$
         .pipe(

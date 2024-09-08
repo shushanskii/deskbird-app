@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core'
+import { Component, inject, Input } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { User, UsersStore } from 'store/users.store'
 import {
@@ -47,9 +47,7 @@ import { AsyncPipe } from '@angular/common'
   styleUrl: './users.component.scss',
   providers: [UsersStore],
 })
-export class UsersComponent implements OnInit {
-  isLoading = true
-
+export class UsersComponent {
   readonly dialog = inject(MatDialog)
 
   users$: Observable<User[]> = of([])
@@ -60,16 +58,14 @@ export class UsersComponent implements OnInit {
   constructor(
     private readonly usersStore: UsersStore,
     private router: Router,
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.users$ = this.usersStore.users$
     this.loading$ = this.usersStore.loading$
     this.usersStore.getUsers()
   }
 
   onEditClick(id: string) {
-    this.router.navigate(['/', 'users', id])
+    this.router.navigate(['/users', { id }])
   }
 
   @Input()
@@ -77,13 +73,19 @@ export class UsersComponent implements OnInit {
     if (!id) {
       this.dialog.closeAll()
     } else {
-      this.openDialog(id)
+      this.users$.subscribe((users: User[]) => {
+        const user = users.find(({ id: _id }) => id === _id)
+
+        if (user) {
+          this.openDialog(user)
+        }
+      })
     }
   }
 
-  openDialog(id: string): void {
+  openDialog(user: User): void {
     const dialogRef = this.dialog.open(UserEditDialogComponent, {
-      data: { id },
+      data: { ...user },
     })
 
     dialogRef.afterClosed().subscribe(() => {
