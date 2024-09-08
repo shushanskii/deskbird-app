@@ -11,6 +11,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms'
+import Cookies from 'js-cookie'
 
 @Component({
   selector: 'app-login',
@@ -62,6 +63,7 @@ export class LoginComponent {
   }
 
   onSubmit() {
+    Cookies.set('authorized', `${Date.now()}`)
     console.info(this.loginForm.value)
   }
 }
