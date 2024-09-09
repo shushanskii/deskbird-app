@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { inject } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { map, exhaustMap, catchError } from 'rxjs/operators'
 import { UsersService } from 'users/users.service'
 import { EMPTY, of } from 'rxjs'
 import { addUsers, fetchUsers } from './users.actions'
+import { User } from './users.state'
 
 export const loadUsers = createEffect(
   (actions$ = inject(Actions), userService = inject(UsersService)) =>
@@ -14,14 +14,13 @@ export const loadUsers = createEffect(
         let cachedUsers = localStorage.getItem('users')
         if (cachedUsers) {
           cachedUsers = JSON.parse(cachedUsers)
-          console.info('cache', cachedUsers)
           if (cachedUsers && cachedUsers?.length > 1) {
-            console.info('from cache')
-            return of().pipe(map(() => addUsers({ users: cachedUsers as any })))
+            return of().pipe(
+              map(() => addUsers({ users: cachedUsers as unknown as User[] })),
+            )
           }
         }
 
-        console.info('direct')
         return userService.fetchUsers().pipe(
           map(users => {
             const _users = localStorage.getItem('users')

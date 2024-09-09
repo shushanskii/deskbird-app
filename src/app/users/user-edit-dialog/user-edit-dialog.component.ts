@@ -62,6 +62,7 @@ export class UserEditDialogComponent {
 
   onOkClick(): void {
     if (this.userEditForm.valid) {
+      this.router.navigate(['/users'])
       this.store.dispatch(
         updateUsers({
           user: {
@@ -74,7 +75,6 @@ export class UserEditDialogComponent {
           },
         }),
       )
-      this.router.navigate(['/users'])
     }
   }
 }
