@@ -24,6 +24,7 @@ import { Store } from '@ngrx/store'
 import { User } from 'store/users.state'
 import { selectLoading, selectUsers } from 'store/users.selectors'
 import { fetchUsers } from 'store/users.actions'
+import { AuthService } from '../login/Auth.service'
 
 @Component({
   selector: 'app-users',
@@ -53,17 +54,20 @@ import { fetchUsers } from 'store/users.actions'
 })
 export class UsersComponent {
   readonly dialog = inject(MatDialog)
+  readonly authService = inject(AuthService)
   readonly store = inject(Store)
   private router = inject(Router)
 
   users$: Observable<User[]> = of([])
   loading$: Observable<boolean> = of(false)
+  hasEditPermission = false
   displayedColumns: string[] = ['firstName', 'lastName', 'email', 'edit']
 
   constructor() {
     this.users$ = this.store.select(selectUsers)
     this.loading$ = this.store.select(selectLoading)
     this.store.dispatch(fetchUsers())
+    this.hasEditPermission = !!this.authService.getCurrentUser()?.isAdmin
   }
 
   onEditClick(id: string) {
