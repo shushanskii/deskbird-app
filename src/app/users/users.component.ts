@@ -1,6 +1,5 @@
 import { Component, inject, Input } from '@angular/core'
 import { Observable, of } from 'rxjs'
-import { User, UsersStore } from 'store/users.store'
 import {
   MatCell,
   MatCellDef,
@@ -21,7 +20,10 @@ import { MatDialog } from '@angular/material/dialog'
 import { UserEditDialogComponent } from './user-edit-dialog/user-edit-dialog.component'
 import { Router } from '@angular/router'
 import { AsyncPipe, JsonPipe } from '@angular/common'
-import { AuthService } from '../login/Auth.service'
+import { Store } from '@ngrx/store'
+import { User } from 'store/users.state'
+import { selectLoading, selectUsers } from 'store/users.selectors'
+import { fetchUsers } from 'store/users.actions'
 
 @Component({
   selector: 'app-users',
@@ -47,24 +49,21 @@ import { AuthService } from '../login/Auth.service'
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
-  providers: [UsersStore],
+  providers: [],
 })
 export class UsersComponent {
   readonly dialog = inject(MatDialog)
-  readonly usersStore = inject(UsersStore)
-  readonly authService = inject(AuthService)
+  readonly store = inject(Store)
   private router = inject(Router)
 
   users$: Observable<User[]> = of([])
   loading$: Observable<boolean> = of(false)
-  currentUser: User | undefined = undefined
   displayedColumns: string[] = ['firstName', 'lastName', 'email', 'edit']
 
   constructor() {
-    this.users$ = this.usersStore.users$
-    this.loading$ = this.usersStore.loading$
-    this.currentUser = this.authService.getCurrentUser()
-    this.usersStore.getUsers()
+    this.users$ = this.store.select(selectUsers)
+    this.loading$ = this.store.select(selectLoading)
+    this.store.dispatch(fetchUsers())
   }
 
   onEditClick(id: string) {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { User } from 'store/users.store'
+import { User } from 'store/users.state'
 import Cookies from 'js-cookie'
 
 @Injectable({

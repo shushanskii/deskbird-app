@@ -4,7 +4,6 @@ import {
   MatDialogContent,
   MatDialogClose,
   MatDialogTitle,
-  MatDialogRef,
 } from '@angular/material/dialog'
 import {
   MatFormField,
@@ -21,9 +20,11 @@ import {
 import { MatInput, MatInputModule } from '@angular/material/input'
 import { MatButton } from '@angular/material/button'
 import { MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { User, UsersStore } from 'store/users.store'
 import { MatCheckbox } from '@angular/material/checkbox'
 import { Router } from '@angular/router'
+import { User } from 'store/users.state'
+import { Store } from '@ngrx/store'
+import { updateUsers } from 'store/users.actions'
 
 @Component({
   selector: 'app-user-edit-dialog',
@@ -45,13 +46,12 @@ import { Router } from '@angular/router'
   ],
   templateUrl: './user-edit-dialog.component.html',
   styleUrl: './user-edit-dialog.component.scss',
-  providers: [UsersStore],
+  providers: [],
 })
 export class UserEditDialogComponent {
+  readonly store = inject(Store)
   readonly router = inject(Router)
-  readonly dialogRef = inject(MatDialogRef)
   readonly data = inject<User>(MAT_DIALOG_DATA)
-  readonly usersStore = inject(UsersStore)
 
   userEditForm = new FormGroup({
     firstName: new FormControl(this.data.firstName, [Validators.required]),
@@ -61,15 +61,20 @@ export class UserEditDialogComponent {
   })
 
   onOkClick(): void {
-    this.usersStore.updateUser({
-      id: this.data.id,
-      password: this.data.password,
-      firstName: this.userEditForm.controls['firstName'].value!,
-      lastName: this.userEditForm.controls['lastName'].value!,
-      email: this.userEditForm.controls['email'].value!,
-      isAdmin: !!this.userEditForm.controls['isAdmin'].value,
-    })
-
-    this.router.navigate(['/users'])
+    if (this.userEditForm.valid) {
+      this.store.dispatch(
+        updateUsers({
+          user: {
+            id: this.data.id,
+            password: this.data.password,
+            firstName: this.userEditForm.controls['firstName'].value!,
+            lastName: this.userEditForm.controls['lastName'].value!,
+            email: this.userEditForm.controls['email'].value!,
+            isAdmin: !!this.userEditForm.controls['isAdmin'].value,
+          },
+        }),
+      )
+      this.router.navigate(['/users'])
+    }
   }
 }
